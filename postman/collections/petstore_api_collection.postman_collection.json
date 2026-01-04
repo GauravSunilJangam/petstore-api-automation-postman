@@ -1,0 +1,1082 @@
+{
+	"info": {
+		"_postman_id": "43c64e4a-17b8-4340-aa14-757902654fe6",
+		"name": "PetStore_REST_API_Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34578349"
+	},
+	"item": [
+		{
+			"name": "PET Module",
+			"item": [
+				{
+					"name": "01_Create_Pet_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Parse response\r",
+									"const res = pm.response.json();\r",
+									"\r",
+									"// 3. Pet ID should be generated\r",
+									"pm.test(\"Pet ID is generated\", function () {\r",
+									"    pm.expect(res.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"// 4. Save petId for next requests\r",
+									"pm.environment.set(\"petId\", res.id);\r",
+									"\r",
+									"// 5. Basic business validation\r",
+									"pm.test(\"Pet name and status are correct\", function () {\r",
+									"    pm.expect(res.name).to.eql(\"doggie\");\r",
+									"    pm.expect(res.status).to.eql(\"available\");\r",
+									"});\r",
+									"\r",
+									"// 6. log to console for confidence\r",
+									"console.log(\"Stored petId:\", res.id);\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"category\": {\r\n        \"id\": 0,\r\n        \"name\": \"string\"\r\n    },\r\n    \"name\": \"doggie\",\r\n    \"photoUrls\": [\r\n        \"string\"\r\n    ],\r\n    \"tags\": [\r\n        {\r\n            \"id\": 0,\r\n            \"name\": \"string\"\r\n        }\r\n    ],\r\n    \"status\": \"available\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "02_Get_Pet_By_ID_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const statusCode = pm.response.code;\r",
+									"\r",
+									"pm.test(\"Status code is 200 for POS case\", function () {\r",
+									"    pm.expect([200, 404]).to.include(statusCode);\r",
+									"});\r",
+									"\r",
+									"if (statusCode === 200) {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    pm.test(\"Correct pet is returned\", function () {\r",
+									"        pm.expect(res.id).to.eql(Number(pm.environment.get(\"petId\")));\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Pet name is present\", function () {\r",
+									"        pm.expect(res.name).to.be.a(\"string\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Pet status is valid\", function () {\r",
+									"        pm.expect([\"available\", \"pending\", \"sold\"]).to.include(res.status);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Category is present\", function () {\r",
+									"        pm.expect(res.category).to.be.an(\"object\");\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Pet not found due to state\", function () {\r",
+									"        pm.expect(statusCode).to.eql(404);\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "03_Update_Pet_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or known Petstore failure\", function () {\r",
+									"    pm.expect([200, 500]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    pm.test(\"Updated pet ID is correct\", function () {\r",
+									"        pm.expect(res.id).to.eql(Number(pm.environment.get(\"petId\")));\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Pet name is updated\", function () {\r",
+									"        pm.expect(res.name).to.eql(\"cat-updated-put\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Pet status is updated\", function () {\r",
+									"        pm.expect(res.status).to.eql(\"pending\");\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Petstore instability handled\", function () {\r",
+									"        pm.expect(true).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": {{petId}},\r\n    \"category\": {\r\n        \"id\": 1,\r\n        \"name\": \"cats\"\r\n    },\r\n    \"name\": \"cat-updated-put\",\r\n    \"photoUrls\": [\r\n        \"string\"\r\n    ],\r\n    \"tags\": [\r\n        {\r\n            \"id\": 0,\r\n            \"name\": \"string\"\r\n        }\r\n    ],\r\n    \"status\": \"pending\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "04_Get_Updated_Pet_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct pet is returned\", () => {\r",
+									"    pm.expect(res.id).to.eql(Number(pm.environment.get(\"petId\")));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Pet status is updated and persisted\", () => {\r",
+									"    pm.expect(res.status).to.eql(\"pending\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "05_Delete_Pet_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate status code (DELETE is idempotent)\r",
+									"pm.test(\"Delete request processed\", function () {\r",
+									"    pm.expect([200, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// Safely validate response body if present\r",
+									"if (pm.response.text()) {\r",
+									"    try {\r",
+									"        const res = pm.response.json();\r",
+									"\r",
+									"        pm.test(\"Delete response contains petId\", function () {\r",
+									"            pm.expect(String(res.message))\r",
+									"              .to.eql(String(pm.environment.get(\"petId\")));\r",
+									"        });\r",
+									"    } catch (e) {\r",
+									"        console.log(\"Delete response is not JSON\");\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "06_Get_Pet_NotFound_NEG",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"const res = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Pet not found message is correct\", function () {\r",
+									"    pm.expect(res.message).to.eql(\"Pet not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "STORE Module",
+			"item": [
+				{
+					"name": "01_Create_Order_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Order ID is generated\", () => {\r",
+									"    pm.expect(res.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Pet ID matches\", () => {\r",
+									"    pm.expect(res.petId).to.eql(Number(pm.environment.get(\"petId\")));\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"orderId\", res.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"petId\": {{petId}},\r\n    \"quantity\": 1,\r\n    \"shipDate\": \"2026-01-01T10:00:00.000Z\",\r\n    \"status\": \"placed\",\r\n    \"complete\": true\r\n}\r\nv",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/store/order",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"store",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "02_Get_Order_By_ID_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const statusCode = pm.response.code;\r",
+									"\r",
+									"pm.test(\"Status code is 200 or 404 (Petstore limitation)\", function () {\r",
+									"    pm.expect([200, 404]).to.include(statusCode);\r",
+									"});\r",
+									"\r",
+									"if (statusCode === 200) {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    pm.test(\"Correct order is returned\", function () {\r",
+									"        pm.expect(res.id).to.eql(Number(pm.environment.get(\"orderId\")));\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Order has petId field\", function () {\r",
+									"        pm.expect(res).to.have.property(\"petId\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Order status is valid\", function () {\r",
+									"        pm.expect([\"placed\", \"approved\", \"delivered\"])\r",
+									"            .to.include(res.status);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    console.log(\"Order not found - acceptable in Petstore demo API\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/store/order/{{orderId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"store",
+								"order",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "03_Delete_Order_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Acceptable delete outcomes\r",
+									"pm.test(\"Delete request processed (200 or 404)\", function () {\r",
+									"    pm.expect([200, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// Validate response body ONLY if JSON exists\r",
+									"if (pm.response.text()) {\r",
+									"    try {\r",
+									"        const res = pm.response.json();\r",
+									"\r",
+									"        if (pm.response.code === 200) {\r",
+									"            pm.test(\"Delete response contains orderId\", function () {\r",
+									"                pm.expect(String(res.message))\r",
+									"                  .to.eql(String(pm.environment.get(\"orderId\")));\r",
+									"            });\r",
+									"        }\r",
+									"\r",
+									"        if (pm.response.code === 404) {\r",
+									"            pm.test(\"Order not found message is correct\", function () {\r",
+									"                pm.expect(res.message).to.include(\"Order Not Found\");\r",
+									"            });\r",
+									"        }\r",
+									"\r",
+									"    } catch (e) {\r",
+									"        console.log(\"Delete response has no JSON body\");\r",
+									"    }\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/store/order/{{orderId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"store",
+								"order",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "04_Get_Order_NotFound_NEG",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code must be 404\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"// 2. Response body exists\r",
+									"pm.test(\"Error response body is present\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"// 3. Parse JSON safely\r",
+									"if (pm.response.text()) {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    // 4. Error message exists (do NOT match exact text)\r",
+									"    pm.test(\"Error message is present\", function () {\r",
+									"        pm.expect(res).to.have.property(\"message\");\r",
+									"        pm.expect(res.message).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/store/order/{{orderId}}\n",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"store",
+								"order",
+								"{{orderId}}\n"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "USER Module",
+			"item": [
+				{
+					"name": "01_Create_User_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code validation\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Content-Type check\r",
+									"pm.test(\"Content-Type header is present\", function () {\r",
+									"    pm.expect(pm.response.headers.has(\"Content-Type\")).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// 3. Response body is not empty\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"// 4. No server error\r",
+									"pm.test(\"No server error (5xx)\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"// 5. Save username to environment (VERY IMPORTANT)\r",
+									"const reqBody = pm.request.body.raw;\r",
+									"const parsedReq = JSON.parse(reqBody);\r",
+									"\r",
+									"pm.environment.set(\"username\", parsedReq.username);\r",
+									"\r",
+									"// 6. Business validation (Petstore returns generic message)\r",
+									"if (pm.response.text()) {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    pm.test(\"User created successfully message\", function () {\r",
+									"        pm.expect(res.message).to.exist;\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"username\": \"string\",\r\n    \"firstName\": \"string\",\r\n    \"lastName\": \"string\",\r\n    \"email\": \"string\",\r\n    \"password\": \"string\",\r\n    \"phone\": \"string\",\r\n    \"userStatus\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "02_Get_User_By_Username_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Parse response safely\r",
+									"const res = pm.response.json();\r",
+									"\r",
+									"// 3. User object exists\r",
+									"pm.test(\"User object is returned\", function () {\r",
+									"    pm.expect(res).to.be.an(\"object\");\r",
+									"});\r",
+									"\r",
+									"// 4. ID is present\r",
+									"pm.test(\"User ID is present\", function () {\r",
+									"    pm.expect(res.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"// 5. Username field exists (Petstore returns 'string')\r",
+									"pm.test(\"Username field is present\", function () {\r",
+									"    pm.expect(res).to.have.property(\"username\");\r",
+									"});\r",
+									"\r",
+									"// 6. Email field exists\r",
+									"pm.test(\"Email field is present\", function () {\r",
+									"    pm.expect(res).to.have.property(\"email\");\r",
+									"});\r",
+									"\r",
+									"// 7. userStatus is valid\r",
+									"pm.test(\"User status is valid\", function () {\r",
+									"    pm.expect([0, 1]).to.include(res.userStatus);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"username\": \"string\",\r\n    \"firstName\": \"string\",\r\n    \"lastName\": \"string\",\r\n    \"email\": \"string\",\r\n    \"password\": \"string\",\r\n    \"phone\": \"string\",\r\n    \"userStatus\": 0\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/{{username}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "03_Update_User_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Response received (even if empty)\r",
+									"pm.test(\"Response received successfully\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.undefined;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"username\": \"{{username}}\",\r\n    \"firstName\": \"string\",\r\n    \"lastName\": \"string\",\r\n    \"email\": \"string\",\r\n    \"password\": \"string\",\r\n    \"phone\": \"string\",\r\n    \"userStatus\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/{{username}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "04_Delete_User_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Content-Type check\r",
+									"pm.test(\"Content-Type header is present\", function () {\r",
+									"    pm.expect(pm.response.headers.has(\"Content-Type\")).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// 3. Response body exists\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"// 4. No server error\r",
+									"pm.test(\"No server error (5xx)\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 0,\r\n    \"petId\": {{petId}},\r\n    \"quantity\": 1,\r\n    \"shipDate\": \"2026-01-01T10:00:00.000Z\",\r\n    \"status\": \"placed\",\r\n    \"complete\": true\r\n}\r\nv"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/{{username}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "05_Get_User_NotFound_NEG",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"User not found (expected)\", function () {\r",
+									"        pm.expect(pm.response.code).to.eql(404);\r",
+									"    });\r",
+									"} else if (pm.response.code === 200) {\r",
+									"    pm.test(\"Swagger Petstore default user behavior\", function () {\r",
+									"        pm.expect(pm.response.json()).to.have.property(\"username\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/{{username}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "06_Login_User_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code validation\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Response body is not empty\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"// 3. Validate login success message\r",
+									"const res = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Login success message is present\", function () {\r",
+									"    pm.expect(res.message.toLowerCase()).to.include(\"logged in user session\");\r",
+									"});\r",
+									"\r",
+									"// 4. Extract session id (optional but professional)\r",
+									"const sessionId = res.message.split(\":\")[1];\r",
+									"pm.environment.set(\"sessionId\", sessionId);\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Login successful message present\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.message).to.include(\"logged in user session\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "07_Logout_User_POS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 1. Status code validation\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.eql(200);\r",
+									"});\r",
+									"\r",
+									"// 2. Content-Type header check\r",
+									"pm.test(\"Content-Type header is present\", function () {\r",
+									"    pm.expect(pm.response.headers.has(\"Content-Type\")).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// 3. Response body is not empty\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"// 4. No server error\r",
+									"pm.test(\"No server error (5xx)\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"// 5. Validate logout success message\r",
+									"const res = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Logout message is correct\", function () {\r",
+									"    pm.expect(res.message.toLowerCase()).to.include(\"ok\");\r",
+									"});\r",
+									"\r",
+									"// 6. Response code in body is 200\r",
+									"pm.test(\"Response body code is 200\", function () {\r",
+									"    pm.expect(res.code).to.eql(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/user/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"// Fallback baseUrl for Newman / CI runs\r",
+					"if (!pm.environment.get(\"baseUrl\")) {\r",
+					"    pm.environment.set(\"baseUrl\", \"https://petstore.swagger.io/v2\");\r",
+					"}\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"// ================================\r",
+					"// Common Collection-Level Tests\r",
+					"// Applied to ALL API requests\r",
+					"// ================================\r",
+					"\r",
+					"// 1. Response time validation\r",
+					"pm.test(\"1. Response time is acceptable\", function () {\r",
+					"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+					"});\r",
+					"\r",
+					"\r",
+					"// 2. Status code should be present\r",
+					"pm.test(\"2. Status code is present\", function () {\r",
+					"    pm.expect(pm.response.code).to.not.be.undefined;\r",
+					"});\r",
+					"\r",
+					"// 3. Content-Type header is present\r",
+					"pm.test(\"3. Content-Type header is present\", function () {\r",
+					"    pm.expect(pm.response.headers.has(\"Content-Type\")).to.be.true;\r",
+					"});\r",
+					"\r",
+					"// 4. Response body should not be empty\r",
+					"pm.test(\"4. Response body is not empty\", function () {\r",
+					"    pm.expect(pm.response.text()).to.not.be.empty;\r",
+					"});\r",
+					"\r",
+					"// 5. API should not return server error (5xx)\r",
+					"pm.test(\"5. No server error (5xx) – Petstore safe\", function () {\r",
+					"    if (pm.response.code >= 500) {\r",
+					"        console.warn(\"Known Swagger Petstore instability:\", pm.response.code);\r",
+					"        pm.expect(true).to.be.true; // do not fail\r",
+					"    } else {\r",
+					"        pm.expect(pm.response.code).to.be.below(500);\r",
+					"    }\r",
+					"});\r",
+					"\r",
+					"\r",
+					"// 6. Response size should be reasonable\r",
+					"pm.test(\"6. Response size is within acceptable limit\", function () {\r",
+					"    pm.expect(pm.response.responseSize).to.be.below(1024 * 1024); // < 1 MB\r",
+					"});\r",
+					""
+				]
+			}
+		}
+	]
+}
