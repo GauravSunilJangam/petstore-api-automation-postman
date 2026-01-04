@@ -1,63 +1,75 @@
-🚀 PetStore API Automation – Postman & Newman
-📌 Project Overview
+# 🚀 PetStore API Automation – Postman & Newman
 
-This project demonstrates end-to-end REST API automation testing using Postman and Newman on the Swagger PetStore public REST API.
+![Postman Collection Structure](screenshots/01_postman_collection_structure.png)
 
-The framework covers positive, negative, and regression scenarios with environment-based execution and detailed HTML reporting.
+![Postman Assertions Passed](screenshots/02_postman_assertions_passed.png)
 
-🧪 Application Under Test
+![Newman HTML Report Dashboard](screenshots/03_newman_dashboard.png)
 
-Swagger PetStore – Public REST API
-Base URL: https://petstore.swagger.io/v2
+![Newman HTML Report Summary](screenshots/04_newman_summary_table.png)
 
-🧩 Modules Covered
-🐶 Pet Module
 
-Create Pet
 
-Get Pet by ID
+---
 
-Update Pet
+## 📌 Project Overview
+This project demonstrates **end-to-end REST API automation testing** using **Postman** and **Newman** on the **Swagger PetStore Public REST API**.
 
-Delete Pet
+The framework is designed to validate:
+- ✅ **Positive scenarios**
+- ❌ **Negative scenarios**
+- 🔁 **Regression test coverage**
 
-Pet Not Found (Negative)
+It supports **environment-based execution** and generates **detailed HTML reports** for easy analysis.
 
-🏬 Store Module
+---
 
-Create Order
+## 🧪 Application Under Test
+**Swagger PetStore – Public REST API**
 
-Get Order by ID
+🔗 **Base URL:**  
+ https://petstore.swagger.io/v2
 
-Delete Order
 
-Order Not Found (Negative)
+---
 
-👤 User Module
+## 🧩 Modules Covered
 
-Create User
+### 🐶 Pet Module
+- Create Pet
+- Get Pet by ID
+- Update Pet
+- Delete Pet
+- Pet Not Found (Negative)
 
-Get User
+### 🛒 Store Module
+- Create Order
+- Get Order by ID
+- Delete Order
+- Order Not Found (Negative)
 
-Update User
+### 👤 User Module
+- Create User
+- Get User
+- Update User
+- Delete User
+- Login User
+- Logout User
 
-Delete User
+---
 
-Login & Logout
+## 🛠 Tools & Technologies
+- **Postman** – API testing & scripting  
+- **Newman** – Command-line collection runner  
+- **newman-reporter-htmlextra** – Rich HTML reports  
+- **JavaScript** – Assertions & test logic  
+- **Git & GitHub** – Version control  
 
-🛠 Tools & Technologies
+---
 
-Postman – API testing & scripting
+## 📂 Project Structure
 
-Newman – CLI execution
 
-newman-reporter-htmlextra – HTML reporting
-
-JavaScript – Assertions & test logic
-
-Git & GitHub – Version control
-
-📂 Project Structure
 petstore-api-automation-postman
 ├── postman
 │   ├── collections
@@ -68,33 +80,38 @@ petstore-api-automation-postman
 │   └── PetStore_Report.html
 └── README.md
 
-⚙️ Environment Configuration
 
-The project uses Postman Environment Variables:
+---
 
-baseUrl
+## ⚙️ Environment Configuration
+The project uses **Postman Environment Variables** for dynamic execution:
 
-petId
+| Variable   | Description |
+|------------|-------------|
+| `baseUrl`  | API base URL |
+| `petId`    | Dynamic pet ID |
+| `orderId`  | Dynamic order ID |
+| `username` | User login name |
+| `password` | User password |
 
-orderId
+📄 **Environment File:**  
 
-username
-
-password
-
-Environment file:
 
 postman/environments/petstore_qa_environment.postman_environment.json
 
-▶️ How to Execute Using Newman
-🔹 Prerequisites
 
-Node.js installed
+---
 
-Newman installed globally
+## ▶️ How to Execute Using Newman
 
+### 🔹 Prerequisites
+- Node.js installed  
+- Newman installed globally
+
+```bash
 npm install -g newman
 npm install -g newman-reporter-htmlextra
+
 
 🔹 Run Collection with HTML Report
 newman run postman/collections/petstore_api_collection.postman_collection.json \
@@ -108,29 +125,31 @@ After execution, an HTML execution report is generated at:
 
 reports/PetStore_Report.html
 
-
 Open this file in any browser to view:
-
 Request-wise execution status
-
 Assertions summary
-
 Response times
-
 Failure details (if any)
+
+
+## 🧪 Test Summary
+
+| Module | Total APIs | Positive | Negative | Status |
+|------|-----------|----------|----------|--------|
+| Pet | 6 | 5 | 1 | ✅ Passed |
+| Store | 4 | 3 | 1 | ✅ Passed |
+| User | 7 | 6 | 1 | ✅ Passed |
+| **Total** | **17** | **14** | **3** | ✅ Passed |
+
 
 ✅ Key Highlights
 
 Environment-based execution
 
 Collection-level common assertions
-
 Dynamic ID handling using environment variables
-
 Swagger PetStore instability handled gracefully (5xx safe assertions)
-
 Newman CLI execution with HTML report
-
 CI/CD ready structure
 
 👤 Author
