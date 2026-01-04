@@ -4,9 +4,9 @@
 
 ![Postman Assertions Passed](screenshots/02_postman_assertions_passed.png)
 
-![Newman HTML Report Dashboard](screenshots/03_newman_dashboard.png)
+![Postman Summary Table](screenshots/03_postman_summary_table.png)
 
-![Newman HTML Report Summary](screenshots/04_newman_summary_table.png)
+![Newman HTML Report Dashboard](screenshots/04_newman_dashboard.png)
 
 
 
@@ -28,7 +28,7 @@ It supports **environment-based execution** and generates **detailed HTML report
 **Swagger PetStore – Public REST API**
 
 🔗 **Base URL:**  
- https://petstore.swagger.io/v2
+ https://petstore.swagger.io
 
 
 ---
@@ -58,7 +58,7 @@ It supports **environment-based execution** and generates **detailed HTML report
 
 ---
 
-## 🛠 Tools & Technologies
+## 🛠 Tech Stack
 - **Postman** – API testing & scripting  
 - **Newman** – Command-line collection runner  
 - **newman-reporter-htmlextra** – Rich HTML reports  
@@ -71,6 +71,7 @@ It supports **environment-based execution** and generates **detailed HTML report
 
 
 petstore-api-automation-postman
+
 ├── postman
 │   ├── collections
 │   │   └── petstore_api_collection.postman_collection.json
@@ -79,7 +80,6 @@ petstore-api-automation-postman
 ├── reports
 │   └── PetStore_Report.html
 └── README.md
-
 
 ---
 
