@@ -1,4 +1,8 @@
 # 🚀 PetStore API Automation – Postman & Newman
+[![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)](https://www.postman.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Newman](https://img.shields.io/badge/Newman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)](https://learning.postman.com/docs/running-collections/using-newman-cli/command-line-integration-with-newman/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GauravSunilJangam)
 
 ![Postman Collection Structure](screenshots/01_postman_collection_structure.png)
 
@@ -7,7 +11,6 @@
 ![Postman Summary Table](screenshots/03_postman_summary_table.png)
 
 ![Newman HTML Report Dashboard](screenshots/04_newman_dashboard.png)
-
 
 
 ---
